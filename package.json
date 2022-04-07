@@ -1,0 +1,32 @@
+{
+  "name": "pastebin",
+  "version": "1.0.0",
+  "description": "pastebin clone with privacy considerations",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon --exec babel-node src/server.js",
+    "start": "node dist/server.js",
+    "build": "",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "API"
+  ],
+  "author": "Akinwale Folorunsho Habib",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.9",
+    "@babel/node": "^7.16.8",
+    "@babel/preset-env": "^7.16.11",
+    "bcryptjs": "^2.4.3",
+    "config": "^3.3.7",
+    "express": "^4.17.3",
+    "express-validator": "^6.14.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "5.0.10"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
