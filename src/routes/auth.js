@@ -9,6 +9,7 @@ const router = express.Router();
  * @description   Register user and return token
  * @access        Public
  */
+// TODO: validate email to match domain in config
 router.post('/', [
   check('name', 'Name is required.')
     .not()

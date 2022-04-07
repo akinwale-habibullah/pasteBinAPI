@@ -42,7 +42,7 @@ const signup =  async (req, res) => {
     jwt.sign(
       payload,
       config.get('jwtSecret'),
-      { expiresIn: '360000' },
+      { expiresIn: '6h' },
       (err, token) => {
         if (err) throw err;
 
@@ -54,7 +54,10 @@ const signup =  async (req, res) => {
     );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({
+      status: 'error',
+      error: 'Server error'
+    });
   }
 };
 
@@ -101,7 +104,7 @@ const login =  async (req, res) => {
     jwt.sign(
       payload,
       config.get('jwtSecret'),
-      { expiresIn: '360000' },
+      { expiresIn: '6h' },
       (err, token) => {
         if (err) throw err;
 
@@ -113,9 +116,14 @@ const login =  async (req, res) => {
     );
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({
+      status: 'error',
+      'error': 'Server error'
+    });
   }
 };
+
+// TODO: activate email link - optional
 
 export {
   signup,
