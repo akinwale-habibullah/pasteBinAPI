@@ -7,6 +7,7 @@ import {
   getAllPastesByUser,
   getPasteById,
   deletePasteById,
+  updatePaste,
   downloadPasteById
 } from '../controllers/paste'
 
@@ -75,6 +76,57 @@ router.get('/', auth, getAllPastesByUser);
  * @access        Private
  */
 router.get('/:id', auth, getPasteById);
+
+/**
+ * @route         PUT api/paste/:pasteid
+ * @description   Update paste by id
+ * @access        Private
+ */
+router.put('/:id', [
+  auth,
+  [
+    check('text', 'Text must be a non empty string.')
+      .optional()
+      .isString()
+      .not()
+      .isEmpty(),
+    check('password', 'Password must be of string data type.')
+      .optional()
+      .isString(),
+    check('password', 'Password length must be between 6 and 30 characters.')
+      .optional()
+      .isLength({ min: 6, max: 30}),
+    check('title', 'Title must be of String data type.')
+      .optional()
+      .isString(),
+    check('burnAfterRead', 'burnAfterRead must be of Boolean data type.')
+      .optional()
+      .isBoolean(),
+    check('expiresOn', 'expiresOn must be of number data type.')
+      .optional()
+      .isNumeric(),
+    check('expiresOn')
+      .optional()
+      .custom((value) => {
+        const intValue = parseInt(value);
+        if (!moment(intValue).isValid()) {
+          throw new Error('expiresOn must be valid UNIX timestamp.');
+        } else {
+          return value;
+        }
+      }),
+    check('expiresOn')
+      .optional()
+      .custom((value) => {
+        const intValue = parseInt(value);
+        if (moment(intValue).isValid() && moment(intValue) < Date.now()) {
+          throw new Error('expiresOn UNIX timestamp must be a future date.');
+        } else {
+          return value
+        }
+      })
+  ]
+], updatePaste);
 
 /**
  * @route         DELETE api/paste/:pasteid

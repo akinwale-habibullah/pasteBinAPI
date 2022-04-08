@@ -178,7 +178,7 @@ const deletePasteById = async (req, res) => {
         data: {
           msg: 'A paste can only be deleted by its author.'
         }
-      })
+      });
     }
 
     Paste.findOneAndRemove({_id: id}, (err, doc) => {
@@ -208,6 +208,71 @@ const deletePasteById = async (req, res) => {
       status: 'error',
       error:  'Server error'
     });
+  }
+};
+
+const updatePaste = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      status: 'fail',
+      data: errors.array()
+    });
+  }
+
+  const { id } = req.params;
+  try {
+    const paste = Paste.findById(id);
+
+    if (!paste) {
+      return res.status(404).json({
+        status: 'fail',
+        data: {
+          msg: 'Paste not found'
+        }
+      });
+    }
+
+    // check user is paste author
+    if (req.user.id.toString() !== paste.author.toString()) {
+      return res.status(401).json({
+        status: 'fail',
+        data: {
+          msg: 'A paste can only be updated by its author.'
+        }
+      });
+    }
+
+    const { text, password, title, burnAfterRead, expiresOn } = req.body;
+    if (text) {
+      paste.text = text;
+    }
+    if (password) {
+      paste['password'] = password;
+    }
+    if (title) {
+      paste['title'] = title;
+    }
+    if (burnAfterRead) {
+      paste['burnAfterRead'] = burnAfterRead;
+    }
+    if (expiresOn) {
+      paste['expiresOn'] = expiresOn;
+    }
+
+    await paste.save();
+
+    if (expiresOn) {
+      scheduleJob(new Date(expiresOn), paste.id);
+    }
+
+    res.json({
+      status: 'success',
+      data: paste
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
   }
 };
 
@@ -278,5 +343,6 @@ export {
   getAllPastesByUser,
   getPasteById,
   deletePasteById,
+  updatePaste,
   downloadPasteById
 }
