@@ -1,7 +1,6 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import moment from 'moment';
 import { check, validationResult } from 'express-validator';
-import Paste from '../models/Paste';
 import auth from '../middleware/auth';
 import {
   createPaste,
@@ -36,9 +35,29 @@ router.post('/', [
       check('burnAfterRead', 'burnAfterRead must be of Boolean data type.')
         .optional()
         .isBoolean(),
-      check('expiresOn', 'expiredOn must be of number data type.')
+      check('expiresOn', 'expiresOn must be of number data type.')
         .optional()
         .isNumeric(),
+      check('expiresOn')
+        .optional()
+        .custom((value) => {
+          const intValue = parseInt(value);
+          if (!moment(intValue).isValid()) {
+            throw new Error('expiresOn must be valid UNIX timestamp.');
+          } else {
+            return value;
+          }
+        }),
+      check('expiresOn')
+        .optional()
+        .custom((value) => {
+          const intValue = parseInt(value);
+          if (moment(intValue).isValid() && moment(intValue) < Date.now()) {
+            throw new Error('expiresOn UNIX timestamp must be a future date.');
+          } else {
+            return value
+          }
+        })
     ]
   ],
   createPaste);
