@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { validationResult } from 'express-validator';
 import Paste from '../models/Paste';
+import scheduleJob from '../utils/scheduler';
 
 const createPaste = async (req, res) => {
   const errors = validationResult(req);
@@ -25,29 +26,17 @@ const createPaste = async (req, res) => {
     }
     if (burnAfterRead) {
       newPaste['burnAfterRead'] = burnAfterRead;
-
-      // TODO: check if paste has expiry and schedule delete period
-        // validate time is in the future
-        // schedule delete job
     }
     if (expiresOn) {
-      // check if valid epoch time
-      if (!Date(expiresOn)) {
-        return res.status(400).json({
-          status: 'fail',
-          data: [{
-            msg: "Invalid expiry date",
-            param: "expiresOn",
-            location: "body"
-          }]
-        });
-      }
-
       newPaste['expiresOn'] = expiresOn;
     }
 
     const paste = new Paste(newPaste);
     await paste.save();
+
+    if (expiresOn) {
+        scheduleJob(new Date(expiresOn), paste.id);
+    }
 
     res.json({
       status: 'success',
@@ -130,13 +119,23 @@ const getPasteById = async (req, res) => {
       })
     }
 
-
-    // TODO: check if paste has burnAfterRead
-
     res.json({
       status: 'success',
       data: paste
     });
+
+    // check if burnAfterRead and not author
+    if (paste.burnAfterRead && 
+      req.user.id.toString() !== paste.author.toString()
+    ) {
+      Paste.findOneAndDelete({
+        _id: id
+      }, (err, doc) => {
+        if (err) return console.error(err);
+
+        console.log('paste deleted due to burnAfterRead flag');
+      });
+    }
   } catch (err) {
     console.error(err);
 
@@ -180,18 +179,22 @@ const deletePasteById = async (req, res) => {
         }
       })
     }
-    
-    await paste.remove();
 
-    res.json({
-      status: 'success',
-      data: {
-        msg: 'Paste deleted'
+    Paste.findOneAndRemove({_id: id}, (err, res) => {
+      if (err) {
+        throw err
+      } else {
+        res.json({
+          status: 'success',
+          data: {
+            msg: 'Paste deleted'
+          }
+        });
       }
     });
+
   } catch (err) {
     console.error(err);
-
     if (err.kind === 'ObjectId') {
       return res.status(404).json({
         status: 'fail',
@@ -200,7 +203,6 @@ const deletePasteById = async (req, res) => {
         }
       });
     }
-
     res.status(500).json({
       status: 'error',
       error:  'Server error'
