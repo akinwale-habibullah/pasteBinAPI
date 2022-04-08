@@ -98,25 +98,26 @@ const getPasteById = async (req, res) => {
     }
 
     const { password } = req.query;
-    // check if paste has password and user is not author
-    if (paste.password && !password) {
-      return res.status(401).json({
-        status: 'fail',
-        data: {
-          msg: 'Password is required'
-        }
-      })
-    }
-
+    // check if paste has password and user is not author    
     if (paste.password &&
-        paste.author.toString() !== req.user.id.toString() &&
-        paste.password !== password) {
-      return res.status(401).json({
-        status: 'fail',
-        data: {
-          msg: 'Invalid password.'
-        }
-      })
+      paste.author.toString() !== req.user.id.toString()) {
+          if (!password) {
+            return res.status(401).json({
+              status: 'fail',
+              data: {
+                msg: 'Password is required'
+              }
+            })
+          }
+          
+          if (paste.password !== password) {
+            return res.status(401).json({
+              status: 'fail',
+              data: {
+                msg: 'Invalid password.'
+              }
+            })
+          }
     }
 
     res.json({
@@ -180,7 +181,7 @@ const deletePasteById = async (req, res) => {
       })
     }
 
-    Paste.findOneAndRemove({_id: id}, (err, res) => {
+    Paste.findOneAndRemove({_id: id}, (err, doc) => {
       if (err) {
         throw err
       } else {
