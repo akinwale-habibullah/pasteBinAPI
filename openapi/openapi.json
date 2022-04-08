@@ -1,0 +1,806 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "PasteBin Clone REST API.",
+    "version": "1.0.0",
+    "title": "PasteBin Clone",
+    "contact": {
+      "email": "akinwalehabib@hotmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://linkedin.com/in/akinwalehabibullah"
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Akinwale Habib",
+    "url": "https://linkedin.com/in/akinwalehabibullah"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:4000/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "authentication",
+      "description": "user authentication"
+    },
+    {
+      "name": "paste",
+      "description": "Paste resource"
+    }
+  ],
+  "paths": {
+    "/auth": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Create a new user",
+        "operationId": "signup",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/signupRequest"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/auth200Response"
+          },
+          "400": {
+            "$ref": "#/components/responses/auth400Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "User login",
+        "description": "",
+        "operationId": "login",
+        "requestBody": {
+          "$ref": "#/components/requestBodies/loginRequest"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/auth200Response"
+          },
+          "400": {
+            "$ref": "#/components/responses/login400Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/paste": {
+      "get": {
+        "tags": [
+          "paste"
+        ],
+        "operationId": "getpastes",
+        "summary": "get all paste by logged in user, using the token (Authorization) in request header",
+        "security": [
+          {
+            "tokenauth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/getPastes200Response"
+          },
+          "401": {
+            "$ref": "#/components/responses/createPaste401Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "paste"
+        ],
+        "operationId": "createpaste",
+        "summary": "Create a paste.",
+        "security": [
+          {
+            "tokenauth": []
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/createPasteRequest"
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/createPaste200Response"
+          },
+          "400": {
+            "$ref": "#/components/responses/createPaste400Response"
+          },
+          "401": {
+            "$ref": "#/components/responses/createPaste401Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/paste/{id}": {
+      "get": {
+        "tags": [
+          "paste"
+        ],
+        "operationId": "getpastebyid",
+        "summary": "Get paste by id",
+        "security": [
+          {
+            "tokenauth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pasteid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/getPasteById200Response"
+          },
+          "401": {
+            "$ref": "#/components/responses/getPasteById401Response"
+          },
+          "404": {
+            "$ref": "#/components/responses/getPasteById404Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "paste"
+        ],
+        "operationId": "updatePastebyId",
+        "summary": "Update paste by id",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pasteid"
+          }
+        ],
+        "requestBody": {
+          "$ref": "#/components/requestBodies/updatePasteRequest"
+        },
+        "security": [
+          {
+            "tokenauth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/getPasteById200Response"
+          },
+          "401": {
+            "$ref": "#/components/responses/createPaste401Response"
+          },
+          "404": {
+            "$ref": "#/components/responses/getPasteById404Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "paste"
+        ],
+        "operationId": "deletepastebyid",
+        "summary": "Delete paste by id",
+        "security": [
+          {
+            "tokenauth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pasteid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/deletePasteById200Response"
+          },
+          "401": {
+            "$ref": "#/components/responses/createPaste401Response"
+          },
+          "404": {
+            "$ref": "#/components/responses/getPasteById404Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/paste/{id}/download": {
+      "get": {
+        "tags": [
+          "paste"
+        ],
+        "operationId": "downloadpaste",
+        "summary": "Download paste",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/pasteid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/getPasteById200Response"
+          },
+          "401": {
+            "$ref": "#/components/responses/createPaste401Response"
+          },
+          "404": {
+            "$ref": "#/components/responses/getPasteById404Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "tokenauth": {
+        "type": "http",
+        "description": "Bearer Token",
+        "scheme": "bearer",
+        "bearerFormat": "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdF9uYW1lIjoiSGFiaWIiLCJsYXN0X25hbWUiOiJBa2lud2FsZSIsImVtYWlsIjoiYWtpbndhbGVoYWJpYkBob3RtYWlsLmNvbSIsInJvbGUiOiIyIiwiX2lkIjoiNjEzNDliZGI3NGFmMDQ0NjhmNTEyOWNiIiwiaWF0IjoxNjMwOTE2MDQyLCJleHAiOjE2MzA5MTk2NDJ9.unljkECAfawhnuL97u4J-gykICsw1IebwG5RXO7_i18"
+      }
+    },
+    "parameters": {
+      "pasteid": {
+        "name": "id",
+        "in": "path",
+        "description": "id of paste to fetch",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "601f364d9f603e7f648fcf2c"
+      }
+    },
+    "requestBodies": {
+      "signupRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/signuprequest"
+            }
+          }
+        },
+        "description": "User signup",
+        "required": true
+      },
+      "loginRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/signinrequest"
+            }
+          }
+        },
+        "description": "Sign in",
+        "required": true
+      },
+      "createPasteRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/createPasteRequestSchema"
+            }
+          }
+        },
+        "description": "To create a paste, enter desired values in request body.\n\nRequired parameter\n- text - The text should be of string data type and is required to create a new paste.\n\nOptional parameters\n- password - This parameter ensures that user beside the paste author, viewing this paste (using /paste/:id) has to attach the password as a URL query parameter. Password must be a string of length should be between 6 to 30 characters.\n- title - Paste title.\n- burnAfterRead - Boolean flag that makes the paste self-destruct (delete) once it is viewed by any other user beside the paste author. Default is false.\n- expiresOn - UNIX timestamp that schedules when the message should be deleted, whether or not it has been viewed by any user, including the paste author. The UNIX timestamp MUST be a date in the future.",
+        "required": true
+      },
+      "updatePasteRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/createPasteRequestSchema"
+            }
+          }
+        },
+        "description": "Request parameters\n- text - The text should be of string data type.\n- password - This parameter ensures that user beside the paste author, viewing this paste (using /paste/:id) has to attach the password as a URL query parameter. Password must be a string of length should be between 6 to 30 characters.\n- title - Paste title.\n- burnAfterRead - Boolean flag that makes the paste self-destruct (delete) once it is viewed by any other user beside the paste author. Default is false.\n- expiresOn - UNIX timestamp that schedules when the message should be deleted, whether or not it has been viewed by any user, including the paste author. The UNIX timestamp MUST be a date in the future.",
+        "required": true
+      }
+    },
+    "responses": {
+      "auth200Response": {
+        "description": "Successfully created new user",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/auth200ResponseSchema"
+            }
+          }
+        }
+      },
+      "auth400Response": {
+        "description": "Endpoint returns 400 status code if the email has been used by an existing user or the request parameters are incomplete or invalid.\n\nWhen the email is already taken, the response contains both status and data keys. The data will always be an array with only one key \"msg\" with \"A user with this email already exists.\" value.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/auth400ResponseSchema"
+            }
+          }
+        }
+      },
+      "login400Response": {
+        "description": "Endpoint returns 400 status code if the login credentials are incorrect or the request parameters are incomplete or invalid.\n\nWhen the login credentials are incorrect, the response contains both status and data keys. The data will always be an array with only one key \"msg\" with \"Invalid credentials.\" value.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/auth400ResponseSchema"
+            }
+          }
+        }
+      },
+      "getPastes200Response": {
+        "description": "Endpoint returns an array of paste objects.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/getPastesSchema"
+            }
+          }
+        }
+      },
+      "createPaste200Response": {
+        "description": "Successfully created new paste.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/createPaste200ResponseSchema"
+            }
+          }
+        }
+      },
+      "createPaste400Response": {
+        "description": "Invalid request body parameters.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/createPaste400ResponseSchema"
+            }
+          }
+        }
+      },
+      "createPaste401Response": {
+        "description": "Unauthorized or invalid request.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/createPaste401ResponseSchema"
+            }
+          }
+        }
+      },
+      "getPasteById200Response": {
+        "description": "Get paste by id",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/getPasteById200ResponseSchema"
+            }
+          }
+        }
+      },
+      "getPasteById401Response": {
+        "description": "Endpoint returns 401 if Authorization token is invalid or paste has password and no password was entered.\n\nIf paste has a password, to read the paste, attach the password as a URL query parameter (?password=password).\n- If paste has a password, and the password is incorrect, the \"msg\" in \"data\" will be \"Invalid password\".\n- If paste has a password, and the password is not in URL query parameter, the \"msg\" in \"data\" will be \"Password is required.\".",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/getPasteById401ResponseSchema"
+            }
+          }
+        }
+      },
+      "getPasteById404Response": {
+        "description": "Paste not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/getPasteById404ResponseSchema"
+            }
+          }
+        }
+      },
+      "deletePasteById200Response": {
+        "description": "Delete paste by id",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/deletePasteById200ResponseSchema"
+            }
+          }
+        }
+      },
+      "Error": {
+        "description": "Error occured while processing request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "signuprequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "firstName"
+          },
+          "email": {
+            "type": "string",
+            "example": "demo@host.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "secret"
+          }
+        }
+      },
+      "signinrequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "demo@host.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "secret"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "auth": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjI1MDFhMzk0MmI3NmU2ZjZkYzFjYTZlIn0sImlhdCI6MTY0OTQxNjc2MSwiZXhwIjoxNjQ5NDM4MzYxfQ.EvKU8e9kBM9kYtuwwL77_QXsHit9i6FgfASy8mj10d4"
+          }
+        },
+        "required": [
+          "status",
+          "data"
+        ]
+      },
+      "auth200ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/auth"
+          }
+        },
+        "required": [
+          "status",
+          "data"
+        ]
+      },
+      "auth400ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "msg": {
+                  "type": "string",
+                  "example": "Password must be 6 or more characters"
+                },
+                "param": {
+                  "type": "string",
+                  "example": "password"
+                },
+                "location": {
+                  "type": "string",
+                  "example": "body"
+                }
+              },
+              "required": [
+                "msg"
+              ]
+            }
+          }
+        }
+      },
+      "getPastesSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/pastesSchema"
+          }
+        },
+        "required": [
+          "status",
+          "data"
+        ]
+      },
+      "pastesSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/pasteSchema"
+        }
+      },
+      "pasteSchema": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string",
+            "example": "601f364d9f603e7f648fcf2c"
+          },
+          "text": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+          },
+          "title": {
+            "type": "string",
+            "example": "Sample title"
+          },
+          "password": {
+            "type": "string",
+            "example": "password"
+          },
+          "author": {
+            "type": "string",
+            "example": "6250967c8857acd897819c9b"
+          },
+          "expiresOn": {
+            "type": "string",
+            "example": 1649437112382
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2021-09-05T10:28:43.450Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2021-09-05T10:28:43.450Z"
+          }
+        },
+        "required": [
+          "_id",
+          "text"
+        ]
+      },
+      "createPasteRequestSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+          },
+          "password": {
+            "type": "string",
+            "example": "password"
+          },
+          "title": {
+            "type": "string",
+            "example": "Amazing paste"
+          },
+          "burnAfterRead": {
+            "type": "boolean",
+            "example": true
+          },
+          "expiredOn": {
+            "type": "string",
+            "example": 1649443661353
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "createPaste200ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "pasteURL": {
+                "type": "string",
+                "example": "http://domainname.com:4000/api/paste/625091a642b76e6f6dc1ca7b"
+              }
+            }
+          }
+        },
+        "required": [
+          "status",
+          "data"
+        ]
+      },
+      "createPaste400ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "msg": {
+                  "type": "string",
+                  "example": "Text is required."
+                },
+                "param": {
+                  "type": "string",
+                  "example": "text"
+                },
+                "location": {
+                  "type": "string",
+                  "example": "body"
+                }
+              }
+            }
+          }
+        }
+      },
+      "createPaste401ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "msg": {
+                "type": "string",
+                "example": "Invalid token, authorization denied."
+              }
+            }
+          }
+        }
+      },
+      "getPasteById200ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "$ref": "#/components/schemas/pasteSchema"
+          }
+        },
+        "required": [
+          "status",
+          "data"
+        ]
+      },
+      "getPasteById401ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "msg": {
+                "type": "string",
+                "example": "Password is required."
+              }
+            }
+          }
+        }
+      },
+      "getPasteById404ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "msg": {
+                "type": "string",
+                "example": "Paste not found."
+              }
+            }
+          }
+        }
+      },
+      "deletePasteById200ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "msg": {
+                "type": "string",
+                "example": "Paste deleted."
+              }
+            }
+          }
+        },
+        "required": [
+          "status",
+          "data"
+        ]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "error"
+          },
+          "error": {
+            "type": "string",
+            "example": "Server error"
+          }
+        }
+      }
+    }
+  }
+}
