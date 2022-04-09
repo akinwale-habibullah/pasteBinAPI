@@ -75,7 +75,7 @@ const signup =  async (req, res) => {
       }
     );
   } catch (err) {
-    logger.error(`auth signup controller error: ${err.message}`);
+    logger.error(`auth signup controller error: ${err}`);
     res.status(500).json({
       status: 'error',
       error: 'Server error'
@@ -84,35 +84,17 @@ const signup =  async (req, res) => {
 };
 
 const login =  async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      status: 'fail',
-      data: errors.array()
-    });
-  }
-
-  const { email, password }  = req.body;
-
+  const { password } = req.body;
+  const user = req.user;
+  
   try {
-    // check if user exists
-    let user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({
-        status: 'fail',
-        data: [
-          { msg: 'Invalid credentials'}
-        ]
-      });
-    }
-
     // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({
         status: 'fail',
         data: [
-          { msg: 'Invalid credentials' }
+          { msg: 'Invalid login credentials.' }
         ]
       });
     }
@@ -143,7 +125,8 @@ const login =  async (req, res) => {
       }
     );
   } catch (err) {
-    logger.error(`auth login controller error: ${err.message}`);
+    console.log(err);
+    logger.error(`auth login controller error: ${err}`);
     res.status(500).json({
       status: 'error',
       'error': 'Server error'

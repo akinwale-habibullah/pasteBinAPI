@@ -6,6 +6,7 @@ import {
   login,
   activateAccount
 } from '../controllers/auth';
+import checkUserIsActivated from '../middleware/checkActivation'
 
 const router = express.Router();
 
@@ -50,7 +51,7 @@ router.post('/login', [
     .exists(),
   check('password', 'Password must be 6 or more characters.')
     .isLength({ min: 6, max: 30})
-], login);
+], checkUserIsActivated, login);
 
 /**
  * @route         PUT api/auth/activate/:token
