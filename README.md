@@ -23,6 +23,16 @@ This API provides the similar functionalities to PastBin, but with security and 
 - ```npm run dev```
 - Make API request calls using __Postman__ or any other REST client.
 
+### Key design considerations
+
+- Job Scheduling: This application uses ```node-schedule```, a dependency optimised for scheduling jobs that will run once, as against using a cron based implementation, which runs several times over an internal.
+
+  This dependency is used to delete pastes on the specified expiresOn date.
+
+  The downside of this dependency is that, once the application stops, all scheduled jobs are lost.
+
+  For production based environment, its best to use a separate server or service to manage jobs scheduling that is always up and running, and communication between this app and the job scheduling server can happen over a message queue.
+
 ### Build instruction
 
 This project was written using ES6 modules, hence the need for babel to transpile source code to ES5.
@@ -144,3 +154,18 @@ Example request body:
 
 
 Authentication required, returns confirmation whether paste was successfully deleted or not, in response.data.
+
+### Deployment
+
+On the production server, or in an automated CI/CD pipeline;
+
+- To deploy to production, create a ```production.json``` file in __config__ folder.
+- Copy the values in ```default.json``` into the newly created ```production.json``` file.
+- Run ```npm run build```
+- Run ```npm start```
+
+### Product roadmap
+
+To further improve this API, these are the list of tasks to do;
+
+- Add Unit and Integration tests.
