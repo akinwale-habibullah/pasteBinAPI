@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import User from '../models/User';
 import sendActivationEmail from '../utils/email';
+import logger from '../utils/logger';
 
 const signup =  async (req, res) => {
   const errors = validationResult(req);
@@ -68,7 +69,7 @@ const signup =  async (req, res) => {
       }
     );
   } catch (err) {
-    console.error(err.message);
+    logger.error(`auth signup controller error: ${err.message}`);
     res.status(500).json({
       status: 'error',
       error: 'Server error'
@@ -130,7 +131,7 @@ const login =  async (req, res) => {
       }
     );
   } catch (err) {
-    console.error(err.message);
+    logger.error(`auth login controller error: ${err.message}`);
     res.status(500).json({
       status: 'error',
       'error': 'Server error'
@@ -184,7 +185,6 @@ const activateAccount = async (req, res) => {
     });
   }
 }
-
 
 export {
   signup,

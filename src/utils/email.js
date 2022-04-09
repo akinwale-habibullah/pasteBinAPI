@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import config from 'config';
+import logger from './logger';
 
 const sendActivationEmail = (name, email, link) => {
   const transporter = nodemailer.createTransport({
@@ -25,9 +26,9 @@ const sendActivationEmail = (name, email, link) => {
 
   transporter.sendMail(mailOptions, (err, info) => {
     if(err) {
-      console.err(err);
+      logger.error(`sendActivationEmail error - ${err}`);
     } else {
-      console.log(`Email sent to: ${email}`);
+      logger.info(`sendActiovationEmail - Email sent to: ${email}`);
     }
   });
 };

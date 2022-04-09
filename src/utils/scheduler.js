@@ -1,5 +1,6 @@
 import schedule from 'node-schedule';
 import Paste from '../models/Paste';
+import logger from './logger';
 
 const scheduleJob = (date, id) => {
   schedule.scheduleJob(
@@ -11,13 +12,13 @@ const dropPaste = async (id) => {
   try {
     Paste.findOneAndRemove({_id: id}, (err, res) => {
       if (err) {
-        return console.error(err)
+        return logger.error(`scheduler - dropPaste - Paste.findOneAndRemove - error - ${err}`)
       }
 
       return;
     });
   } catch (err) {
-    console.error(err);
+    logger.error(`scheduler - dropPaste - error - ${err}`);
   }
 };
 
