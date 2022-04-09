@@ -4,6 +4,11 @@ import mongoose from 'mongoose';
 import { validationResult } from 'express-validator';
 import Paste from '../models/Paste';
 import scheduleJob from '../utils/scheduler';
+import logger from '../utils/logger';
+import {
+  createFile,
+  deleteFile
+} from '../utils/filesystem';
 
 const createPaste = async (req, res) => {
   const errors = validationResult(req);
@@ -47,7 +52,7 @@ const createPaste = async (req, res) => {
       }
     })
   } catch (err) {
-    console.error(err.message);
+    logger.error(`createPaste error - ${err}`);
     res.status(500).send('Server error');
   }
 };
@@ -66,7 +71,7 @@ const getAllPastesByUser = async (req, res) => {
       data: pastes
     });
   } catch (err) {
-    console.error(err);
+    logger.error(`getAllPastesByUser error: ${err}`);
 
     if (err.kind === 'ObjectId') {
       return res.status(404).json({
@@ -136,13 +141,13 @@ const getPasteById = async (req, res) => {
       Paste.findOneAndDelete({
         _id: id
       }, (err, doc) => {
-        if (err) return console.error(err);
+        if (err) return logger.error(`getPasteById - Paste.findOneAndDelete error: ${id} - ${err}`);
 
-        console.log('Paste deleted due to burnAfterRead flag');
+        logger.info(`getPasteById - Paste.findOneAndDelete: ${id} deleted due to burnAfterRead flag`);
       });
     }
   } catch (err) {
-    console.error(err);
+    logger.error(`getPasteId error - ${err}`);
 
     if (err.kind === 'ObjectId') {
       return res.status(404).json({
@@ -199,7 +204,7 @@ const deletePasteById = async (req, res) => {
     });
 
   } catch (err) {
-    console.error(err);
+    logger.error(`$deletePasteById error - ${err}`);
     if (err.kind === 'ObjectId') {
       return res.status(404).json({
         status: 'fail',
@@ -275,7 +280,7 @@ const updatePaste = async (req, res) => {
       data: paste
     });
   } catch (err) {
-    console.error(err.message);
+    logger.error(`updatePaste error - ${err}`);
     res.status(500).send('Server error');
   }
 };
@@ -322,39 +327,12 @@ const downloadPasteById = async (req, res) => {
     const filePath = path.join(process.cwd(), 'files', `temp${Math.floor(Math.random() * (1000000 - 1) + 1)}.txt`);
 
     // check if folder exists and create it if not
-    const folderPath = path.join(process.cwd(), 'files');
-    console.log('folderPAth: ', folderPath);
-
-    if (!fs.existsSync(folderPath)) {
-      await new Promise((resolve, reject) => {
-        fs.mkdirSync(folderPath, (err) => {
-          if (err) {
-            console.err(err);
-            reject(err);
-          }
-  
-          console.log('Folder "files" created successfully.');
-          return resolve();
-        });
-      });
-    }
-
-    await new Promise((resolve, reject) => {
-      fs.writeFile(filePath, paste.text, (err) => {
-        if (err) {
-          console.error(err)
-          return reject(err);
-        }
-
-        console.log(`File ${filePath} successfully created.`);
-        resolve();
-      });
-    });
+    await createFile(filePath, paste.text);
 
     await new Promise((resolve, reject) => {
       res.sendFile(filePath, (err) => {
         if (err) {
-          console.error(err);
+          logger.error(`downloadPasteById error - res.sendFile - ${err}`);
           return reject(err);
         }
 
@@ -362,13 +340,7 @@ const downloadPasteById = async (req, res) => {
       });
     });
 
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        return console.err(err);
-      }
-
-      console.log(`Temp paste file at ${filePath} has been deleted`);
-    });
+    await deleteFile(filePath);
 
     // check if burnAfterRead and not author
     if (paste.burnAfterRead && 
@@ -377,13 +349,13 @@ const downloadPasteById = async (req, res) => {
       Paste.findOneAndDelete({
         _id: id
       }, (err, doc) => {
-        if (err) return console.error(err);
+        if (err) return logger.error(`downloadPasteById - burnAfterRead - ${err}`);
 
-        console.log('Paste deleted due to burnAfterRead flag.');
+        logger.info('downloadPasteById - Paste deleted due to burnAfterRead flag.');
       });
     }
   } catch (err) {
-    console.error(err);
+    logger.error(`downloadPasteById error - ${err}`);
 
     if (err.kind === 'ObjectId') {
       return res.status(404).json({
