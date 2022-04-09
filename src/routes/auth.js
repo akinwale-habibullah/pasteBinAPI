@@ -1,4 +1,5 @@
 import express from 'express';
+import config from 'config';
 import { check } from 'express-validator';
 import {
   signup,
@@ -24,6 +25,15 @@ router.post('/', [
     .isLength({ min: 5, max: 40}),
   check('email', 'Invalid email')
     .isEmail(),
+  check('email')
+    .custom((value) => {
+      const emailDomain = value.split('@')[1].toLowerCase();
+      if (!config.get('alloweddomains').includes(emailDomain)) {
+        throw new Error('Email domain not in the list of allowed domains.');
+      } else {
+        return value;
+      }
+    }),
   check('password', 'Password must be 6 or more characters.')
     .isLength({ min: 6, max: 30})
 ], signup);
