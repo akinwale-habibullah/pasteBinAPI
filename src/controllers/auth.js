@@ -50,7 +50,13 @@ const signup =  async (req, res) => {
 
         res.json({
           status: 'success',
-          data: token
+          data: {
+            token,
+            _id: user._id,
+            email: user.email,
+            name: user.name,
+            active: user.active
+          }
         });
       }
     );
@@ -126,7 +132,13 @@ const login =  async (req, res) => {
 
         res.json({
           status: 'success',
-          data: token
+          data: {
+            token,
+            _id: user._id,
+            email: user.email,
+            name: user.name,
+            active: user.active
+          }
         })
       }
     );
