@@ -1,4 +1,9 @@
 {
   "mongoURI": "mongodb://localhost:27017/pastebinclone",
-  "jwtSecret": "secrettoken"
+  "jwtSecret": "secrettoken",
+  "alloweddomains": [
+    "example.com"
+  ],
+  "gmailemail": "",
+  "gmailpassword": ""
 }
