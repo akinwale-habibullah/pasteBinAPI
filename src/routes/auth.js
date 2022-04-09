@@ -1,6 +1,10 @@
 import express from 'express';
 import { check } from 'express-validator';
-import { signup, login } from '../controllers/auth';
+import {
+  signup,
+  login,
+  activateAccount
+} from '../controllers/auth';
 
 const router = express.Router();
 
@@ -37,5 +41,12 @@ router.post('/login', [
   check('password', 'Password must be 6 or more characters.')
     .isLength({ min: 6, max: 30})
 ], login);
+
+/**
+ * @route         PUT api/auth/activate/:token
+ * @description   Activate 
+ * @access        Public
+ */
+router.get('/activate/:token', activateAccount);
 
 export default router;

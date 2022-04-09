@@ -15,9 +15,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  active: {
+    type: Boolean,
+    default: false
+  },
+  token: {
+    type: String
+  },
   avatar: {
     type: String
-  }
+  },
 }, {
   timestamps: true
 });
