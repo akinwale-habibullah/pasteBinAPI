@@ -88,7 +88,9 @@ const getPasteById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const paste = await Paste.findById(id).lean();
+    const paste = await Paste.findById(id)
+      .populate('author', ['name', '_id'])
+      .lean();
 
     if (!paste) {
       return res.status(404).json({
