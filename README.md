@@ -33,6 +33,11 @@ This API provides the similar functionalities to PastBin, but with security and 
 
   For production based environment, its best to use a separate server or service to manage jobs scheduling that is always up and running, and communication between this app and the job scheduling server can happen over a message queue.
 
+- Logging: This application uses winston to generate log files
+
+The log files will be located in ```.logs``` folder in the applications root directory.
+
+
 ### Build instruction
 
 This project was written using ES6 modules, hence the need for babel to transpile source code to ES5.
@@ -169,3 +174,6 @@ On the production server, or in an automated CI/CD pipeline;
 To further improve this API, these are the list of tasks to do;
 
 - Add Unit and Integration tests.
+- Add sanity check middlewares such as;
+  - checkActive: Check if a user's account has been activated before allowing authenticating.
+- Tail log files to a central location using HTTP transport layer.
