@@ -159,7 +159,7 @@ const activateAccount = async (req, res) => {
     }
     // TODO: we should return a well designed INVALID ACTIVATION HTML page.
     if (user.token !== token) {
-      return res.json({
+      return res.status(400).json({
         status: 'fail',
         data: {
           msg: 'Invalid account activation link.'
