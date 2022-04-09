@@ -1,3 +1,5 @@
+import fs from 'fs';
+import path, { resolve } from 'path';
 import mongoose from 'mongoose';
 import { validationResult } from 'express-validator';
 import Paste from '../models/Paste';
@@ -134,7 +136,7 @@ const getPasteById = async (req, res) => {
       }, (err, doc) => {
         if (err) return console.error(err);
 
-        console.log('paste deleted due to burnAfterRead flag');
+        console.log('Paste deleted due to burnAfterRead flag');
       });
     }
   } catch (err) {
@@ -292,33 +294,92 @@ const downloadPasteById = async (req, res) => {
     }
 
     const { password } = req.query;
-    // check if paste has password and user is not author
-    if (paste.password && !password) {
-      return res.status(401).json({
-        status: 'fail',
-        data: {
-          msg: 'Password is required'
-        }
-      })
-    }
-
+    // check if paste has password and user is not author    
     if (paste.password &&
-        paste.author.toString() !== req.user.id.toString() &&
-        paste.password !== password) {
-      return res.status(401).json({
-        status: 'fail',
-        data: {
-          msg: 'Invalid password.'
-        }
-      })
+      paste.author.toString() !== req.user.id.toString()) {
+          if (!password) {
+            return res.status(401).json({
+              status: 'fail',
+              data: {
+                msg: 'Password is required'
+              }
+            })
+          }
+          
+          if (paste.password !== password) {
+            return res.status(401).json({
+              status: 'fail',
+              data: {
+                msg: 'Invalid password.'
+              }
+            })
+          }
     }
 
-    // TODO: stream file to delete
+    // return file
+    const filePath = path.join(process.cwd(), 'files', `temp${Math.floor(Math.random() * (1000000 - 1) + 1)}.txt`);
 
-    res.json({
-      status: 'success',
-      data: paste
+    // check if folder exists and create it if not
+    const folderPath = path.join(process.cwd(), 'files');
+    console.log('folderPAth: ', folderPath);
+
+    if (!fs.existsSync(folderPath)) {
+      await new Promise((resolve, reject) => {
+        fs.mkdirSync(folderPath, (err) => {
+          if (err) {
+            console.err(err);
+            reject(err);
+          }
+  
+          console.log('Folder "files" created successfully.');
+          return resolve();
+        });
+      });
+    }
+
+    await new Promise((resolve, reject) => {
+      fs.writeFile(filePath, paste.text, (err) => {
+        if (err) {
+          console.error(err)
+          return reject(err);
+        }
+
+        console.log(`File ${filePath} successfully created.`);
+        resolve();
+      });
     });
+
+    await new Promise((resolve, reject) => {
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          console.error(err);
+          return reject(err);
+        }
+
+        return resolve();
+      });
+    });
+
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        return console.err(err);
+      }
+
+      console.log(`Temp paste file at ${filePath} has been deleted`);
+    });
+
+    // check if burnAfterRead and not author
+    if (paste.burnAfterRead && 
+      req.user.id.toString() !== paste.author.toString()
+    ) {
+      Paste.findOneAndDelete({
+        _id: id
+      }, (err, doc) => {
+        if (err) return console.error(err);
+
+        console.log('Paste deleted due to burnAfterRead flag.');
+      });
+    }
   } catch (err) {
     console.error(err);
 

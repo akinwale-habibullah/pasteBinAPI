@@ -136,8 +136,8 @@ router.put('/:id', [
 router.delete('/:id', auth, deletePasteById);
 
 /**
- * @route         GET api/paste/:pasteid/download
- * @description   Download paste by id
+ * @route         GET api/paste/:id/download
+ * @description   Get paste as raw txt
  * @access        Private
  */
 router.get('/:id/download', downloadPasteById);
