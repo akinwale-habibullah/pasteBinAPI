@@ -79,6 +79,32 @@
         }
       }
     },
+    "/auth/activate/{token}": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Activate user",
+        "description": "",
+        "operationId": "activateuser",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/token"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/userActivation200Response"
+          },
+          "400": {
+            "$ref": "#/components/responses/userActivation400Response"
+          },
+          "500": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
     "/paste": {
       "get": {
         "tags": [
@@ -220,7 +246,7 @@
             "$ref": "#/components/responses/deletePasteById200Response"
           },
           "401": {
-            "$ref": "#/components/responses/createPaste401Response"
+            "$ref": "#/components/responses/deletePasteById401Response"
           },
           "404": {
             "$ref": "#/components/responses/getPasteById404Response"
@@ -245,7 +271,7 @@
         ],
         "responses": {
           "200": {
-            "$ref": "#/components/responses/getPasteById200Response"
+            "$ref": "#/components/responses/downloadPasteById200Response"
           },
           "401": {
             "$ref": "#/components/responses/createPaste401Response"
@@ -279,6 +305,16 @@
           "type": "string"
         },
         "example": "601f364d9f603e7f648fcf2c"
+      },
+      "token": {
+        "name": "token",
+        "in": "path",
+        "description": "user activation token",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjI1MGQ5NTVhODAwMDc3Y2E1OWY2YmQ0In0sImlhdCI6MTY0OTQ2NTY4NSwiZXhwIjoxNjQ5NTUyMDg1fQ.Fj2vqK653qRANPxhSFLSH8CYJV0VpaRMVLs0M2gwbes."
       }
     },
     "requestBodies": {
@@ -354,6 +390,26 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/auth400ResponseSchema"
+            }
+          }
+        }
+      },
+      "userActivation200Response": {
+        "description": "Successfully activated user account.",
+        "content": {
+          "text/html": {
+            "schema": {
+              "$ref": "#/components/schemas/userAuthentication200ResponseSchema"
+            }
+          }
+        }
+      },
+      "userActivation400Response": {
+        "description": "Endpoint returns 400 status code if activation token is expired or invalid, user is already activated.\n\nIf the activation is expired, invalid or incorrect, the response contains both status and data keys. The data will always be an array with only one key \"msg\" with \"Invalid account activation link.\" value.\nIf the activation is altered after being sent to user's email, the altered token becomes invalid and incorrect.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/userActivation400ResponseSchema"
             }
           }
         }
@@ -434,6 +490,26 @@
           "application/json": {
             "schema": {
               "$ref": "#/components/schemas/deletePasteById200ResponseSchema"
+            }
+          }
+        }
+      },
+      "deletePasteById401Response": {
+        "description": "Endpoint returns 401 status code if the Authorization token is invalid or expired, or if the user associated to the Authorization token is not the paste author.\n\nIf the user associated with the Authorization token is not the paste author, \"msg\" in \"data\" will be \"A paste can only be deleted by its author.\"",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/deletePasteById401ResponseSchema"
+            }
+          }
+        }
+      },
+      "downloadPasteById200Response": {
+        "description": "Get paste as raw txt",
+        "content": {
+          "text/plan": {
+            "schema": {
+              "$ref": "#/components/schemas/downloadPasteById200ResponseSchema"
             }
           }
         }
@@ -550,6 +626,28 @@
               "required": [
                 "msg"
               ]
+            }
+          }
+        }
+      },
+      "userAuthentication200ResponseSchema": {
+        "type": "string",
+        "example": "<html>web page</html>"
+      },
+      "userActivation400ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "fail"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "msg": {
+                "type": "string",
+                "example": "Invalid account activation link."
+              }
             }
           }
         }
@@ -787,6 +885,32 @@
           "status",
           "data"
         ]
+      },
+      "deletePasteById401ResponseSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "msg": {
+                "type": "string",
+                "example": "A paste can only be deleted by its author."
+              }
+            }
+          }
+        },
+        "required": [
+          "status",
+          "data"
+        ]
+      },
+      "downloadPasteById200ResponseSchema": {
+        "type": "string",
+        "example": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
       },
       "Error": {
         "type": "object",
